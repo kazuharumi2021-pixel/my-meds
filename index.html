@@ -9,19 +9,19 @@
 <div id="modal" class="modal hidden"><div id="sheet" class="sheet"></div></div>
 <script>
 'use strict';
-const APP_VERSION='1.0-safe';
+const APP_VERSION='1.1-safe';
 const medicines=[
 {id:'aga',use:'発毛',name:'Dクリニック 発毛内服 MH・FC・ZB',type:'定期',when:'朝',dose:'各1カプセル',info:'発毛治療の院内調剤薬。成分対応は処方資料で要確認。',stock:0},
-{id:'dul',use:'気分・痛み',name:'デュロキセチン 20mg',type:'定期',when:'朝食後',dose:'1カプセル',info:'抗うつ薬・疼痛緩和薬として処方。',stock:0},
+{id:'dul',use:'気分・痛み',name:'デュロキセチン 20mg',type:'定期',when:'朝食後',dose:'1カプセル',info:'抗うつ薬・疼痛緩和薬として処方。',effects:'うつ病・うつ状態、および一部の疾患に伴う疼痛など。',side:'眠気、頭痛、めまい、吐き気、口渇、便秘などが報告されています。',stock:0},
 {id:'tad',use:'その他',name:'タダラフィル 6mg',type:'定期',when:'1日1回',dose:'1錠',info:'処方元の指示を優先。',stock:0},
 {id:'boost',use:'発毛',name:'Dミノキブースター＋外用薬',type:'定期',when:'洗髪後',dose:'指示量',info:'発毛外用。処方指示に従う。',stock:0},
-{id:'lox',use:'痛み',name:'ロキソプロフェンNa 60mg',type:'必要時',when:'必要時',dose:'1錠',info:'解熱・消炎・鎮痛薬。',stock:0},
+{id:'lox',use:'痛み',name:'ロキソプロフェンNa 60mg',type:'必要時',when:'必要時',dose:'1錠',info:'解熱・消炎・鎮痛薬。',effects:'痛み・炎症や発熱を抑える目的で使われる薬です。',side:'胃部不快感、腹痛、吐き気、眠気などが報告されています。',stock:0},
 {id:'dia2',use:'不安',name:'ジアゼパム 2mg',type:'必要時',when:'必要時',dose:'処方指示量',info:'筋緊張緩和・抗不安目的。',stock:0},
 {id:'maoto',use:'風邪など',name:'ツムラ麻黄湯',type:'必要時',when:'必要時',dose:'処方指示量',info:'漢方薬。',stock:0},
 {id:'lanso',use:'胃',name:'ランソプラゾールOD 15mg',type:'必要時',when:'必要時',dose:'処方指示量',info:'胃酸分泌抑制薬。',stock:0},
 {id:'epi',use:'鼻炎',name:'エピナスチン 10mg',type:'必要時',when:'必要時',dose:'1錠',info:'アレルギー症状に使用。',stock:0},
-{id:'zol',use:'睡眠',name:'ゾルピデム 5mg',type:'睡眠',when:'就寝前',dose:'処方指示量',info:'睡眠薬。処方指示を確認。',stock:0},
-{id:'tri',use:'睡眠',name:'トリアゾラム 0.125mg',type:'睡眠',when:'就寝前',dose:'処方指示量',info:'睡眠導入薬。処方指示を確認。',stock:0},
+{id:'zol',use:'睡眠',name:'ゾルピデム 5mg',type:'睡眠',when:'就寝前',dose:'処方指示量',info:'睡眠薬。処方指示を確認。',effects:'不眠症の治療に用いられる睡眠薬です。',side:'眠気、ふらつき、記憶への影響などに注意。睡眠随伴症状として異常行動が現れることがあります。',stock:0},
+{id:'tri',use:'睡眠',name:'トリアゾラム 0.125mg',type:'睡眠',when:'就寝前',dose:'処方指示量',info:'睡眠導入薬。処方指示を確認。',effects:'不眠症などに用いられる睡眠導入薬です。',side:'眠気、ふらつき、記憶への影響などに注意。睡眠随伴症状として異常行動が現れることがあります。',stock:0},
 {id:'esz',use:'睡眠',name:'エスゾピクロン 1mg',type:'過去',when:'就寝前',dose:'処方指示量',info:'過去の睡眠薬。',stock:3},
 {id:'nit',use:'睡眠',name:'ニトラゼパム 5mg',type:'過去',when:'就寝前',dose:'処方指示量',info:'過去の睡眠薬。',stock:3},
 {id:'quv',use:'睡眠',name:'クービビック 25mg',type:'過去',when:'不眠時',dose:'処方指示量',info:'過去の睡眠薬。',stock:3},
@@ -40,7 +40,7 @@ function logMed(id){const m=medicines.find(x=>x.id===id);openSheet(`<h2>${esc(m.
 function commitLog(id){const m=medicines.find(x=>x.id===id);logs.push({id,name:m.name,use:m.use,ts:new Date().toISOString(),day:dayKey(),eff:document.getElementById('eff').value,cond:document.getElementById('cond')?.value||'',memo:document.getElementById('memo').value});save();closeSheet();render();}
 function quick(m){return `<div class="row" style="padding:9px 0;border-bottom:1px solid #eef0f4"><div class="grow"><b>${esc(m.use)}</b><div class="sub">${esc(m.name)}</div></div><button class="btn" type="button" onclick="logMed('${m.id}')">＋飲んだ</button></div>`;}
 function renderToday(){const done=new Set(logs.filter(x=>x.day===dayKey()).map(x=>x.id));document.getElementById('todayView').innerHTML='<div class="section">今日やること</div>'+medicines.filter(x=>x.type==='定期').map(m=>`<div class="card ${done.has(m.id)?'done':''}"><div class="row"><div class="grow"><span class="pill">${esc(m.use)}</span><div class="title">${esc(m.name)}</div><div class="sub">${esc(m.when)}・${esc(m.dose)}</div></div><button class="btn" type="button" onclick="logMed('${m.id}')">${done.has(m.id)?'✓ 記録済':'飲んだ'}</button></div></div>`).join('')+'<div class="section">💤 睡眠・就寝時</div><div class="card">'+medicines.filter(x=>x.type==='睡眠').map(quick).join('')+'</div><div class="section">必要なとき</div><div class="card">'+medicines.filter(x=>x.type==='必要時').map(quick).join('')+'</div>';}
-function detail(id){const m=medicines.find(x=>x.id===id);openSheet(`<h2>${esc(m.use)}｜${esc(m.name)}</h2><p>${esc(m.info)}</p><div class="section">飲み方</div><div class="card">${esc(m.when)}・${esc(m.dose)}</div><div class="section">残量</div><select onchange="setStock('${id}',this.selectedIndex)">${stockLabels.map((x,i)=>`<option ${i===(stocks[id]??m.stock??3)?'selected':''}>${x}</option>`).join('')}</select>`);}
+function detail(id){const m=medicines.find(x=>x.id===id);openSheet(`<h2>${esc(m.use)}｜${esc(m.name)}</h2><p>${esc(m.info)}</p><div class="section">効果・効能</div><div class="card">${esc(m.effects||'この薬は製剤・処方目的の確認が必要なため、今は確定情報を表示していません。')}</div><div class="section">主な副作用・注意</div><div class="card">${esc(m.side||'この薬は製剤の確認が必要なため、今は確定情報を表示していません。')}</div><div class="alert">表示は確認補助です。処方時の説明と最新の電子添文を優先してください。</div><div class="section">飲み方</div><div class="card">${esc(m.when)}・${esc(m.dose)}</div><div class="section">残量</div><select onchange="setStock('${id}',this.selectedIndex)">${stockLabels.map((x,i)=>`<option ${i===(stocks[id]??m.stock??3)?'selected':''}>${x}</option>`).join('')}</select>`);}
 function setStock(id,n){stocks[id]=n;save();}
 function renderMeds(){document.getElementById('medsView').innerHTML='<h2>薬一覧</h2>'+['定期','必要時','睡眠','過去'].map(g=>'<div class="section">'+g+'</div>'+medicines.filter(m=>m.type===g).map(m=>`<div class="card" onclick="detail('${m.id}')"><span class="pill">${esc(m.use)}</span><div class="title">${esc(m.name)}</div><div class="sub">${esc(m.when)}・${esc(m.dose)}｜${stockLabels[stocks[m.id]??m.stock??3]}</div></div>`).join('')).join('');}
 function renderHistory(){const arr=[...logs].reverse();document.getElementById('historyView').innerHTML=`<h2>服薬履歴</h2><div class="grid"><div class="card"><b>${logs.length}</b><div class="mut">総記録数</div></div><div class="card"><b>${new Set(logs.map(x=>x.day)).size}</b><div class="mut">記録した日数</div></div></div>`+(arr.length?arr.map(x=>`<div class="card"><span class="pill">${esc(x.use)}</span><div class="title">${esc(x.name)}</div><div class="sub">${new Date(x.ts).toLocaleString('ja-JP')}・${esc(x.eff)}</div><div>${esc(x.memo||'')}</div></div>`).join(''):'<div class="card">まだ記録がありません。</div>');}
